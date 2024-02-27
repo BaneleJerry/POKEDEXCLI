@@ -7,12 +7,12 @@ import (
 	"strings"
 )
 
-func startRepl() {
+func startRepl(cfg *config) {
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 
-		fmt.Printf(">")
+		fmt.Printf("pokedex >")
 		scanner.Scan()
 		text := scanner.Text()
 		cleaned := cleanIput(text)
@@ -47,6 +47,11 @@ func getCommands() map[string]cliCommand {
 			name:        "exit",
 			description: "Exit the Pokedex",
 			callback:    commandExit,
+		},
+		"map":{
+			name:        "map",
+            description: "Displays the map in pokemon World",
+            callback:    commandMap,
 		},
 	}
 }

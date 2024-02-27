@@ -25,15 +25,15 @@ func startRepl(cfg *config) {
 			continue
 		}
 
-		cmd.callback()
-
+		err := cmd.callback(cfg)
+		fmt.Println(err)
 	}
 }
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(c *config) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -48,10 +48,15 @@ func getCommands() map[string]cliCommand {
 			description: "Exit the Pokedex",
 			callback:    commandExit,
 		},
-		"map":{
+		"map": {
 			name:        "map",
-            description: "Displays the map in pokemon World",
-            callback:    commandMap,
+			description: "Displays next page of the map in pokemon World",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb:",
+			description: "Display previous page of the map in pokemon World",
+			callback:    commandBackMap,
 		},
 	}
 }

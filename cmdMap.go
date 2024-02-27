@@ -1,20 +1,16 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"log"
-
-	"github.com/BaneleJerry/POKEDEXCLI/internal/pokeapi"
 )
 
-func commandMap() error {
+func commandMap(c *config) error {
 
-	pokeapiClient := pokeapi.NewClient()
-
-	resp, err := pokeapiClient.LocationAreasResp()
+	resp, err := c.pokeapiClient.LocationAreasResp(c.nextLocactinAreaURL)
 
 	if err != nil {
-		log.Fatal(err)
+		return err
 
 	}
 
@@ -23,6 +19,32 @@ func commandMap() error {
 	for _, area := range resp.Results {
 		fmt.Printf("-%s\n", area.Name)
 	}
+	c.nextLocactinAreaURL = resp.Next
+	c.prevLocactinAreaURL = resp.Previous
+
+	return nil
+}
+
+func commandBackMap(c *config) error {
+
+	if c.prevLocactinAreaURL == nil {
+		return errors.New("Your on the first page")
+	}
+	resp, err := c.pokeapiClient.LocationAreasResp(c.prevLocactinAreaURL)
+
+	if err != nil {
+		return err
+
+	}
+
+	fmt.Println("Location")
+
+	for _, area := range resp.Results {
+		fmt.Printf("-%s\n", area.Name)
+	}
+
+	c.nextLocactinAreaURL = resp.Next
+	c.prevLocactinAreaURL = resp.Previous
 
 	return nil
 }

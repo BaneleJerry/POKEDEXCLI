@@ -7,16 +7,24 @@ import (
 	"net/http"
 )
 
-func (c *Client) LocationAreasResp(pageurl *string) (LocationAreasResp, error) {
-
-	endpoint := "location"
-	fullURL := baseURl + endpoint
-
-	if pageurl != nil{
-		fullURL = *pageurl
+// ListLocations -
+func (c *Client) ListLocations(pageURL *string) (LocationAreasResp, error) {
+	url := baseURl + "/location-area"
+	if pageURL != nil {
+		url = *pageURL
 	}
 
-	req, err := http.NewRequest("GET", fullURL, nil)
+	if val, ok := c.cache.Get(url); ok {
+		locationsResp := LocationAreasResp{}
+		err := json.Unmarshal(val, &locationsResp)
+		if err != nil {
+			return LocationAreasResp{}, err
+		}
+
+		return locationsResp, nil
+	}
+
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return LocationAreasResp{}, err
 	}
@@ -27,21 +35,17 @@ func (c *Client) LocationAreasResp(pageurl *string) (LocationAreasResp, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode >= 400 {
-		return LocationAreasResp{}, fmt.Errorf("%v", resp.Status)
-	}
-
 	dat, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return LocationAreasResp{}, err
 	}
 
-	locationAreasResp := LocationAreasResp{}
-	err = json.Unmarshal(dat, &locationAreasResp)
-
+	locationsResp := LocationAreasResp{}
+	err = json.Unmarshal(dat, &locationsResp)
 	if err != nil {
 		return LocationAreasResp{}, err
 	}
 
-	return locationAreasResp, nil
+	c.cache.Add(url, dat)
+	return locationsResp, nil
 }

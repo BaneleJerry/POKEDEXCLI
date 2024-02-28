@@ -7,7 +7,7 @@ import (
 
 func commandMap(c *config) error {
 
-	resp, err := c.pokeapiClient.LocationAreasResp(c.nextLocactinAreaURL)
+	resp, err := c.pokeapiClient.ListLocations(c.nextLocactinAreaURL)
 
 	if err != nil {
 		return err
@@ -22,7 +22,7 @@ func commandMap(c *config) error {
 	c.nextLocactinAreaURL = resp.Next
 	c.prevLocactinAreaURL = resp.Previous
 
-	return nil
+	return err
 }
 
 func commandBackMap(c *config) error {
@@ -30,7 +30,7 @@ func commandBackMap(c *config) error {
 	if c.prevLocactinAreaURL == nil {
 		return errors.New("Your on the first page")
 	}
-	resp, err := c.pokeapiClient.LocationAreasResp(c.prevLocactinAreaURL)
+	resp, err := c.pokeapiClient.ListLocations(c.prevLocactinAreaURL)
 
 	if err != nil {
 		return err
@@ -46,5 +46,5 @@ func commandBackMap(c *config) error {
 	c.nextLocactinAreaURL = resp.Next
 	c.prevLocactinAreaURL = resp.Previous
 
-	return nil
+	return err
 }
